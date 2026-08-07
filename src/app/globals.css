@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #0a1628;
+  --navy-mid: #0d1f3c;
+  --navy-light: #1a2f4a;
+  --teal: #00d4c8;
+  --teal-dim: rgba(0, 212, 200, 0.15);
+  --teal-glow: rgba(0, 212, 200, 0.08);
+  --gold: #f5a623;
+  --gold-dim: rgba(245, 166, 35, 0.15);
+  --white: #ffffff;
+  --silver: #8899aa;
+  --silver-dim: #4a5a6a;
+  --green-live: #00a651;
+  --ink: #334155;
+
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: 1px solid rgba(0, 212, 200, 0.2);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4rem;
+}
+
+body {
+  color: var(--white);
+  background: var(--navy);
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Glass panel — default (for dark sections) */
+  .glass {
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Glass panel — hover state (interactive cards) */
+  .glass-hover {
+    transition: all 0.3s ease;
+  }
+  .glass-hover:hover {
+    background: rgba(0, 212, 200, 0.06);
+    border-color: rgba(0, 212, 200, 0.3);
+  }
+
+  /* Glass panel — gold variant for featured content */
+  .glass-gold {
+    background: rgba(245, 166, 35, 0.06);
+    border: 1px solid rgba(245, 166, 35, 0.2);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: var(--radius-md);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  /* Glass panel — for white sections */
+  .glass-light {
+    background: rgba(10, 22, 40, 0.06);
+    border: 1px solid rgba(10, 22, 40, 0.15);
+    border-radius: var(--radius-md);
+  }
+
+  /* Gradient heading — brand triangle colours */
+  .gradient-heading {
+    background: linear-gradient(135deg, #ffffff 0%, #00d4c8 50%, #f5a623 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
