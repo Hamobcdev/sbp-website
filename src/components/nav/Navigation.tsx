@@ -5,9 +5,11 @@ import { useState } from "react";
 
 const LINKS = [
   { label: "About", href: "#about" },
+  { label: "Services", href: "#services" },
   { label: "Platform", href: "#platform" },
   { label: "Research", href: "#research" },
   { label: "Blog", href: "#blog" },
+  { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
 ];
 
