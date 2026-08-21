@@ -6,24 +6,42 @@ const SERVICES = [
     title: "Government DPI Advisory",
     body: "Strategic advisory for Pacific governments adopting blockchain-based digital public infrastructure. Legislative framework design, governance sequencing, standards compliance assessment, and implementation roadmap.",
     engagement: "Retainer · Project · Workshop",
+    cta: "mailto:anthony@synergybcpacific.com?subject=Government DPI Advisory Enquiry",
   },
   {
     icon: "⬡",
-    title: "Blockchain Architecture",
+    title: "Blockchain Architecture & Build",
     body: "End-to-end design and build of distributed ledger infrastructure for government and enterprise. Distributed node architecture, smart contract design, security hardening to CISA Zero Trust and BIS PFMI standards.",
     engagement: "Fixed-scope · Milestone-based",
+    cta: "mailto:anthony@synergybcpacific.com?subject=Blockchain Architecture Enquiry",
   },
   {
     icon: "🌊",
     title: "Data Marketplace Integration",
     body: "Integration of institutional data endpoints with Pacific Data Commons. Endpoint configuration, x402 payment setup, trust tier verification, and agent marketplace listing. Pacific institutions start earning from their data.",
     engagement: "Setup fee · Revenue share",
+    cta: "https://pdcweb-production.up.railway.app",
   },
   {
     icon: "▲",
     title: "Enterprise Platform Deployment",
     body: "Deployment and customisation of Payshield workforce management and the OGIP interoperability suite for Pacific government and enterprise clients. Training, support, and ongoing maintenance included.",
     engagement: "Licence · SaaS · White-label",
+    cta: "mailto:anthony@synergybcpacific.com?subject=Enterprise Platform Enquiry",
+  },
+  {
+    icon: "🔍",
+    title: "Smart Contract Audit — AuditShield",
+    body: "Professional-grade smart contract security audits at a fraction of traditional firm pricing. Automated static analysis (Slither + Aderyn), four-pass AI consensus pipeline, and mandatory human expert review on every audit. Anchored to OWASP Smart Contract Top 10: 2026. Surface Scan from USD $25 — Professional Audit from USD $2,500. Payment accepted in USDC, USDT, ETH, BTC, and SOL. No bank account required.",
+    engagement: "From $25 · Per audit · Monitoring retainer $299/mo",
+    cta: "mailto:anthony@synergybcpacific.com?subject=AuditShield Audit Request",
+  },
+  {
+    icon: "⬢",
+    title: "Blockchain Consultation for Developers",
+    body: "One-on-one and small-group consultation for developers new to blockchain or building their first on-chain project. Architecture decisions, wallet integration, smart contract fundamentals, x402 payment implementation, and code review. Accessible pricing for independent developers and small teams — local and international. Pay by crypto or traditional payment rails.",
+    engagement: "Hourly · Package · Retainer",
+    cta: "mailto:anthony@synergybcpacific.com?subject=Developer Consultation Request",
   },
 ];
 
@@ -63,6 +81,15 @@ export default function Services() {
               <p className="font-mono text-[11px] uppercase tracking-wide text-gold">
                 {service.engagement}
               </p>
+              <a
+                href={service.cta}
+                target={service.cta.startsWith("http") ? "_blank" : undefined}
+                rel={service.cta.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="mt-5 inline-block font-mono text-[11px] uppercase tracking-wide
+             text-teal hover:text-white transition-colors"
+              >
+                Enquire →
+              </a>
             </GlassCard>
           ))}
         </div>
