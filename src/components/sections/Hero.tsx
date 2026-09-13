@@ -96,7 +96,7 @@ export default function Hero() {
             Explore Our Platform →
           </Button>
           <Button
-            href="https://pdcweb-production.up.railway.app"
+            href="https://pdc-web.onrender.com"
             variant="secondary"
             target="_blank"
           >

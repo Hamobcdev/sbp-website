@@ -34,12 +34,12 @@ const CARDS = [
     label: "Platform",
     value: (
       <a
-        href="https://pdcweb-production.up.railway.app"
+        href="https://pdc-web.onrender.com"
         target="_blank"
         rel="noopener noreferrer"
         className="text-teal hover:underline"
       >
-        pdcweb-production.up.railway.app
+        pdc-web.onrender.com
       </a>
     ),
   },
