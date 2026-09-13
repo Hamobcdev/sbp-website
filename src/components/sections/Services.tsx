@@ -20,7 +20,7 @@ const SERVICES = [
     title: "Data Marketplace Integration",
     body: "Integration of institutional data endpoints with Pacific Data Commons. Endpoint configuration, x402 payment setup, trust tier verification, and agent marketplace listing. Pacific institutions start earning from their data.",
     engagement: "Setup fee · Revenue share",
-    cta: "https://pdcweb-production.up.railway.app",
+    cta: "https://pdc-web.onrender.com",
   },
   {
     icon: "▲",
