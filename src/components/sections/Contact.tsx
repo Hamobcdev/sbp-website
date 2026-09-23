@@ -34,12 +34,12 @@ const CARDS = [
     label: "Platform",
     value: (
       <a
-        href="https://pdc-web.onrender.com"
+        href="https://pacific-data-commons-web-olive.vercel.app/en"
         target="_blank"
         rel="noopener noreferrer"
         className="text-teal hover:underline"
       >
-        pdc-web.onrender.com
+        pacific-data-commons-web-olive.vercel.app
       </a>
     ),
   },
