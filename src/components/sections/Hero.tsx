@@ -96,7 +96,7 @@ export default function Hero() {
             Explore Our Platform →
           </Button>
           <Button
-            href="https://pdc-web.onrender.com"
+            href="https://pacific-data-commons-web-olive.vercel.app/en"
             variant="secondary"
             target="_blank"
           >

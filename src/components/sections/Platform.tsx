@@ -21,7 +21,7 @@ const PRODUCTS = [
     title: "Pacific Data Commons",
     body: "Sovereign data marketplace for the Pacific — institutions list data endpoints and receive direct USDC payments when AI agents and international researchers query them. Live on Algorand Mainnet with confirmed transactions August 2026. Entered in the Algorand x402 Global Challenge.",
     linkLabel: "Open Marketplace →",
-    href: "https://pdc-web.onrender.com",
+    href: "https://pacific-data-commons-web-olive.vercel.app/en",
     accent: "teal" as const,
     badgeColor: "teal" as const,
     glowShadow: "-4px 0 20px rgba(0,212,200,0.3)",
