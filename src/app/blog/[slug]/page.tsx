@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import type { ReactNode } from "react";
@@ -91,6 +92,16 @@ export default function BlogPostPage({
           <span>·</span>
           <span>{formatDate(post.frontmatter.date)}</span>
         </div>
+
+        {post.frontmatter.image && (
+          <Image
+            src={post.frontmatter.image}
+            alt={post.frontmatter.title}
+            width={1200}
+            height={600}
+            className="w-full rounded-lg mb-8 object-cover"
+          />
+        )}
 
         <div>
           <MDXRemote source={post.content} components={mdxComponents} />
