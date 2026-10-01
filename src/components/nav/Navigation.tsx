@@ -8,7 +8,7 @@ const LINKS = [
   { label: "Services", href: "#services" },
   { label: "Platform", href: "#platform" },
   { label: "Research", href: "#research" },
-  { label: "Blog", href: "#blog" },
+  { label: "Blog", href: "/blog" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
   { label: "TipTide", href: "https://tiptide.synergybcpacific.com" },
