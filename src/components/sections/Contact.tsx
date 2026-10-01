@@ -34,12 +34,12 @@ const CARDS = [
     label: "Platform",
     value: (
       <a
-        href="https://pacific-data-commons-web-olive.vercel.app/en"
+        href="https://pdc.synergybcpacific.com"
         target="_blank"
         rel="noopener noreferrer"
         className="text-teal hover:underline"
       >
-        pacific-data-commons-web-olive.vercel.app
+        pdc.synergybcpacific.com
       </a>
     ),
   },

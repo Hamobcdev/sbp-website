@@ -21,7 +21,19 @@ const PRODUCTS = [
     title: "Pacific Data Commons",
     body: "Sovereign data marketplace for the Pacific — institutions list data endpoints and receive direct USDC payments when AI agents and international researchers query them. Live on Algorand Mainnet with confirmed transactions August 2026. Entered in the Algorand x402 Global Challenge.",
     linkLabel: "Open Marketplace →",
-    href: "https://pacific-data-commons-web-olive.vercel.app/en",
+    href: "https://pdc.synergybcpacific.com",
+    accent: "teal" as const,
+    badgeColor: "teal" as const,
+    glowShadow: "-4px 0 20px rgba(0,212,200,0.3)",
+    status: "live" as const,
+  },
+  {
+    icon: "💸",
+    tag: "Live · Algorand · x402",
+    title: "TipTide",
+    body: "SocialFi monetisation for Pacific creators. No bank account required — USDC tips flow peer-to-peer directly to creator wallets on Algorand.",
+    linkLabel: "Open TipTide →",
+    href: "https://tiptide.synergybcpacific.com",
     accent: "teal" as const,
     badgeColor: "teal" as const,
     glowShadow: "-4px 0 20px rgba(0,212,200,0.3)",
@@ -49,10 +61,10 @@ export default function Platform() {
           What We Build
         </p>
         <h2 className="gradient-heading mb-8 max-w-2xl font-body text-4xl font-bold leading-tight">
-          Three platforms. One sovereign infrastructure layer.
+          Four platforms. One sovereign infrastructure layer.
         </h2>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {PRODUCTS.map((product) => (
             <GlassCard
               key={product.title}
