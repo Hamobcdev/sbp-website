@@ -1,0 +1,95 @@
+---
+title: "What Synergy Blockchain Pacific Has Built — A Full Portfolio Overview"
+date: "2026-10-02"
+author: "Anthony Williams"
+category: "Company"
+excerpt: "From citizen identity to creator payments, from maritime trade to sovereign land records — here is the complete picture of what SBP has built for Samoa and the Pacific."
+tags: ["SBP", "OGIP", "Pacific Data Commons", "TipTide", "PayShield", "DPI", "Samoa", "digital infrastructure"]
+image: "/blog/sbp-portfolio-overview.jpg"
+---
+
+## One Company, One Stack, One Region
+
+Synergy Blockchain Pacific has been building sovereign digital infrastructure for Samoa and the Pacific since 2016. Most of that work has happened quietly — in government consultation rooms, on development servers, and in whitepapers submitted to central banks and development finance institutions.
+
+This post is the plain-language account of what we have actually built, what each piece does, and how they connect.
+
+> "We are not building technology for speculation. We are building systems that make government more trustworthy, aid more effective, businesses more efficient, and citizens sovereign over their data."
+
+## The Architecture in Three Layers
+
+Everything SBP builds sits in one of three layers:
+
+**Layer 1 — Samoa Digital Public Infrastructure (OGIP).** Government-facing platforms: citizen identity, ministry interoperability, donor transparency, trade facilitation, and central bank operations.
+
+**Layer 2 — Pacific Data Commons.** International commercial data marketplace. Pacific institutions monetise their data assets. AI agents and researchers pay USDC per query. SBP operates the directory and the payment rail.
+
+**Layer 3 — Financial Inclusion Applications.** Consumer and creator-facing platforms built on the same payment infrastructure: TipTide for Pacific creators, PayShield for informal workers.
+
+These layers are not separate products. They share identity infrastructure, payment rails, and Algorand-based settlement. A ministry earning USDC from data sales on Pacific Data Commons uses the same wallet infrastructure as a creator earning tips on TipTide.
+
+## Layer 1 — Samoa Digital Public Infrastructure
+
+The OGIP stack is Samoa's One Government Interoperability Platform — a suite of connected portals that allow ministries to share data, citizens to access services, and development partners to verify how funds are being used.
+
+**[Samoa DPI Hub](https://samoa-dpi-landing-v2.vercel.app)** — The central front door. Eight portals live, 25 citizens registered in the test environment, seven active workflows. Currently on testnet pending CBS regulatory consultation.
+
+**[Citizens Portal](https://samoa-dpi-citizens-v2.vercel.app)** — The citizen-facing e-governance portal. View government records, Digital Tālā balances, and connected services. Designed to sync with the National ID project and the Samoa Bureau of Statistics. Online payment capability pending the payment rails and enabling legislation.
+
+**[Verify a Credential](https://samoa-dpi-verify-v2.vercel.app)** — Cryptographic credential verification for employers, service providers, and verification bodies. Confirms a government-issued record is authentic without requiring access to the underlying database.
+
+**[Single Maritime Window](https://samoa-dpi-trade-v2.vercel.app)** — Samoa's digital trade facilitation portal. Customs, shipping, and trade documentation in a single interface. Aligned with WTO TFA obligations and Pacific regional trade integration.
+
+**[Central Bank Command Centre](https://samoa-dpi-admin-v2.vercel.app)** — Operational dashboard for Central Bank of Samoa oversight functions. Real-time cryptographic audit trail of payment system actions.
+
+**[Ministry of Finance Dashboard](https://samoa-dpi-mof-v2.vercel.app)** — Budget execution, disbursement tracking, and financial reporting for the Ministry of Finance.
+
+**[Donor Transparency Portal](https://samoa-dpi-donor-v2.vercel.app)** — Read-only access for World Bank, ADB, ISOC, and bilateral donors. Grant lifecycle transparency and disbursement verification — every tala accounted for cryptographically, not narratively.
+
+**[MAF / DBS Loan Management](https://samoa-pacific-blockchain-hub-maf.vercel.app)** — Ministry of Agriculture and Fisheries dashboard and Development Bank of Samoa loan management stub. Connected to the blockchain hub, pending full DBS backend integration.
+
+**[PayShield](https://pay-shield-web-lovat.vercel.app)** — Financial inclusion platform for informal workers. Employment tracking, earnings records, and references. Designed to provide the documentation trail that informal workers need to access formal banking, superannuation, ACC, and donor-provided grant assistance.
+
+## Layer 2 — Pacific Data Commons
+
+**[pdc.synergybcpacific.com](https://pdc.synergybcpacific.com)** — International data marketplace for Pacific institutions. x402 protocol on Algorand Mainnet. USDC per-query payments direct to provider wallets. 97% to provider, 3% to SBP invoiced monthly.
+
+Five launch categories: fisheries, climate, trade, remittance, and agriculture. On-chain provenance certificates. Three-tier trust system (Bronze identity, Silver community, Gold peer-reviewed). Currently competing in the x402 Global Challenge on Algorand — $100K USD prize, October 2026 measurement window.
+
+The directory API is live at [api.synergybcpacific.com](https://api.synergybcpacific.com). Agent discovery file published at `/.well-known/x402-directory.json`. Real USDC flowing through GoPlausible facilitator on Mainnet.
+
+## Layer 3 — Financial Inclusion Applications
+
+**[TipTide](https://tiptide.synergybcpacific.com)** — SocialFi monetisation layer for Pacific creators. No bank account required. USDC tips flow peer-to-peer from fan wallet to creator wallet. Creators link their existing TikTok, YouTube, and Instagram content — no audience migration needed. 97% to creator, 3% SBP platform fee invoiced monthly. Built on Algorand and x402 micropayment infrastructure.
+
+The target is the generation of Pacific creators who have audiences but no payment rails — Samoan TikTokers, YouTube musicians, cultural storytellers — who cannot access PayPal, Stripe, or creator fund programmes without a foreign bank account. TipTide removes that barrier.
+
+## What Connects Everything
+
+Every platform in this stack shares three underlying architectural commitments:
+
+**Cryptographic accountability.** Every consequential action — a payment authorised, a credential issued, a data query settled — generates an immutable on-chain record. No administrator can retroactively alter it.
+
+**Data sovereignty.** Data never transits SBP infrastructure. Providers host their own endpoints. Citizens control their own credentials. SBP routes payments and trust signals — nothing else.
+
+**No SBP custody.** SBP never holds client funds. Tips go wallet-to-wallet. Data payments go wallet-to-wallet. SBP's 3% fee is invoiced monthly as a single USDC transfer after earnings are already in the provider's wallet. This is an architectural principle, not a policy choice.
+
+## Current Status
+
+Most platforms are in active development or testnet state. The OGIP stack is pending CBS regulatory consultation and enabling legislation before Mainnet deployment. Pacific Data Commons is live on Mainnet. TipTide is live. PayShield is in active development.
+
+We are engaging CBS proactively, not waiting for regulation to arrive before building. The consultation is ongoing and we expect a written regulatory position before full OGIP Mainnet deployment.
+
+## For Donors, Partners, and Government
+
+If you are evaluating SBP for a partnership, grant, or regulatory engagement, here is the honest summary:
+
+The infrastructure is built. The architecture is sound. The regulatory pathway is the current long-pole item — and it is being pursued through the right channels, with the right people, transparently.
+
+We are not a startup that has built a pitch deck. We are a startup that has built the infrastructure and is now navigating the institutional relationships required to deploy it at national scale.
+
+That is a harder and slower path than raising venture capital in San Francisco. It is also the only path that produces sovereign infrastructure that actually belongs to the Pacific.
+
+---
+
+*Anthony Williams is the Founder and Lead Architect of Synergy Blockchain Pacific Limited, based in Apia, Samoa. SBP builds sovereign digital public infrastructure for Samoa and Small Island Developing States. Contact: anthony@synergybcpacific.com · [synergybcpacific.com](https://synergybcpacific.com)*
