@@ -8,9 +8,10 @@ const LINKS = [
   { label: "Services", href: "#services" },
   { label: "Platform", href: "#platform" },
   { label: "Research", href: "#research" },
-  { label: "Blog", href: "#blog" },
+  { label: "Blog", href: "/blog" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
+  { label: "TipTide", href: "https://tiptide.synergybcpacific.com" },
 ];
 
 export default function Navigation() {
@@ -39,6 +40,12 @@ export default function Navigation() {
               <a
                 key={link.href}
                 href={link.href}
+                target={link.href.startsWith("http") ? "_blank" : undefined}
+                rel={
+                  link.href.startsWith("http")
+                    ? "noopener noreferrer"
+                    : undefined
+                }
                 className="font-body text-sm text-silver transition-colors hover:text-teal"
               >
                 {link.label}
@@ -77,6 +84,12 @@ export default function Navigation() {
             <a
               key={link.href}
               href={link.href}
+              target={link.href.startsWith("http") ? "_blank" : undefined}
+              rel={
+                link.href.startsWith("http")
+                  ? "noopener noreferrer"
+                  : undefined
+              }
               onClick={() => setOpen(false)}
               className="font-body text-2xl text-white"
             >

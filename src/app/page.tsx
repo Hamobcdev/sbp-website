@@ -25,7 +25,7 @@ export default function Home() {
       <Gallery />
       <SectionDivider bg="white" />
       <Research />
-      <SectionDivider bg="white" />
+      <SectionDivider bg="navy" />
       <Blog />
       <SectionDivider bg="navy-mid" />
       <Education />
