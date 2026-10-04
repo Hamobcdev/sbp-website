@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AreaSeries,
+  AutoscaleInfo,
   ColorType,
   createChart,
   IChartApi,
@@ -27,6 +28,30 @@ const MAX_HISTORY_POINTS = 200;
 
 const TIMEFRAMES = ["5m", "15m", "1h", "4h", "8h", "1D", "1W", "1M"] as const;
 type Timeframe = (typeof TIMEFRAMES)[number];
+
+// The chart selector's supported tokens, in display order — independent
+// of whatever order/subset the crypto-rates API happens to return them in.
+const SUPPORTED_CHART_TOKENS = ["ALGO", "BTC", "ETH", "XRP", "XLM", "USDC", "USDT"] as const;
+
+// Stablecoins barely move, so a price-relative range would turn sub-cent
+// noise into a chart that looks like a spike/crash — pin a narrow fixed
+// band instead. Every other token auto-scales to its own price range
+// (BTC's absolute range dwarfs ALGO's; deriving it from price handles
+// that without a per-token special case).
+const STABLECOIN_SYMBOLS = new Set(["USDC", "USDT"]);
+
+function chartPriceRange(
+  symbol: string | null,
+  price: number | null
+): { minValue: number; maxValue: number } | null {
+  if (!symbol || typeof price !== "number" || !Number.isFinite(price) || price <= 0) {
+    return null;
+  }
+  if (STABLECOIN_SYMBOLS.has(symbol)) {
+    return { minValue: 0.95, maxValue: 1.05 };
+  }
+  return { minValue: price * 0.95, maxValue: price * 1.05 };
+}
 
 const MONTH_NAMES = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -166,8 +191,16 @@ export default function CryptoPanel({
     if (!seriesRef.current || !selectedSymbol) return;
     const points = historyRef.current.get(selectedSymbol) ?? [];
     seriesRef.current.setData(points);
+
+    const price = pickToken(tokens, selectedSymbol)?.price_usd;
+    const range = chartPriceRange(selectedSymbol, typeof price === "number" ? price : null);
+    seriesRef.current.applyOptions({
+      autoscaleInfoProvider: (original: () => AutoscaleInfo | null) =>
+        range ? { priceRange: range } : original(),
+    });
+
     chartRef.current?.timeScale().fitContent();
-  }, [selectedSymbol, data]);
+  }, [selectedSymbol, data, tokens]);
 
   if (loading) {
     return (
@@ -215,12 +248,14 @@ export default function CryptoPanel({
           onChange={(e) => setSelectedSymbol(e.target.value)}
           className="rounded-sm border border-[var(--pdc-panel-border)] bg-transparent px-3 py-2 font-mono text-sm text-[var(--pdc-text)]"
         >
-          {sortedTokens.map((t) => (
-            <option key={t.symbol} value={t.symbol}>
-              {t.symbol}
-              {priorityTokens.includes(t.symbol) ? " ★" : ""}
-            </option>
-          ))}
+          {SUPPORTED_CHART_TOKENS.filter((symbol) => pickToken(tokens, symbol)).map(
+            (symbol) => (
+              <option key={symbol} value={symbol}>
+                {symbol}
+                {priorityTokens.includes(symbol) ? " ★" : ""}
+              </option>
+            )
+          )}
         </select>
       </div>
 
