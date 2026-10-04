@@ -4,25 +4,59 @@ import { useEffect, useState } from "react";
 import type { CryptoToken, FxRatesResponse } from "../types";
 
 const FIAT_CURRENCIES = [
+  "USD",
+  "AUD",
+  "NZD",
   "WST",
   "FJD",
   "TOP",
   "PGK",
   "VUV",
   "SBD",
-  "AUD",
-  "NZD",
-  "USD",
+  "XPF",
 ];
 
 type Driver = "fiat" | "crypto";
 
+// Last-resort fallback when the live PDC fx-rates fetch is entirely
+// unavailable, or doesn't include this currency — on top of, not instead
+// of, directory-api's own internal static fallback. Values are USD per 1
+// unit of the currency (same direction as a token's price_usd), not
+// currency-per-USD.
+const INDICATIVE_USD_RATES: Record<string, number> = {
+  WST: 0.357,
+  FJD: 0.439,
+  TOP: 0.418,
+  PGK: 0.259,
+  VUV: 0.00837,
+  SBD: 0.119,
+  XPF: 0.00887,
+  AUD: 0.644,
+  NZD: 0.593,
+};
+
+type RateResult = { usdPerUnit: number; indicative: boolean };
+
 function usdRateFor(
   fxData: FxRatesResponse | null,
   currency: string
-): number | undefined {
-  if (currency === "USD") return 1;
-  return fxData?.rates?.USD?.[currency];
+): RateResult | undefined {
+  if (currency === "USD") return { usdPerUnit: 1, indicative: false };
+
+  // Live PDC data (fxRateService.ts convention): rates[code] is currency
+  // units per 1 USD — invert to USD per 1 unit, the direction this
+  // converter uses everywhere else (tokenPrice included).
+  const unitsPerUsd = fxData?.rates?.[currency];
+  if (typeof unitsPerUsd === "number" && unitsPerUsd > 0) {
+    return { usdPerUnit: 1 / unitsPerUsd, indicative: false };
+  }
+
+  const fallback = INDICATIVE_USD_RATES[currency];
+  if (typeof fallback === "number") {
+    return { usdPerUnit: fallback, indicative: true };
+  }
+
+  return undefined;
 }
 
 export default function FiatConverter({
@@ -46,7 +80,9 @@ export default function FiatConverter({
   }, [tokens, priorityTokens, token]);
 
   const tokenPrice = tokens.find((t) => t.symbol === token)?.price_usd;
-  const rate = usdRateFor(fxData, currency);
+  const rateResult = usdRateFor(fxData, currency);
+  const rate = rateResult?.usdPerUnit;
+  const usingIndicativeRate = rateResult?.indicative ?? false;
 
   // Driver: fiat -> recompute crypto amount from the fiat input.
   useEffect(() => {
@@ -56,7 +92,7 @@ export default function FiatConverter({
       setAmountCrypto("");
       return;
     }
-    const usd = amt / rate;
+    const usd = amt * rate;
     setAmountCrypto((usd / tokenPrice).toFixed(4));
   }, [driver, amountFiat, currency, token, rate, tokenPrice]);
 
@@ -69,7 +105,7 @@ export default function FiatConverter({
       return;
     }
     const usd = amt * tokenPrice;
-    setAmountFiat((usd * rate).toFixed(4));
+    setAmountFiat((usd / rate).toFixed(4));
   }, [driver, amountCrypto, currency, token, rate, tokenPrice]);
 
   const rateUnavailable = !rate || !tokenPrice;
@@ -145,10 +181,16 @@ export default function FiatConverter({
         </div>
       </div>
 
-      {rateUnavailable && (
-        <div className="mt-2 font-mono text-[11px] text-[var(--pdc-text-faint)]">
-          Rate unavailable for this pair right now.
+      {usingIndicativeRate ? (
+        <div className="mt-2 font-mono text-[11px] text-[var(--pdc-accent-gold)]">
+          Rate unavailable — using indicative rate
         </div>
+      ) : (
+        rateUnavailable && (
+          <div className="mt-2 font-mono text-[11px] text-[var(--pdc-text-faint)]">
+            Rate unavailable for this pair right now.
+          </div>
+        )
       )}
 
       <div className="mt-2 font-body text-xs text-[var(--pdc-text-dim)]">

@@ -19,13 +19,23 @@ export type CryptoRatesResponse = {
   prices_as_of?: string | null;
 };
 
+// Matches directory-api's /finance/fx response (fxRateService.ts +
+// routes/finance/fx.ts) — `rates` is a flat Record<code, number> already
+// resolved to the response's `base` currency (USD unless ?base= was
+// passed), not a nested per-base map. base_currencies/display_currencies
+// are never actually sent by this API; FxPanel supplies its own curated
+// defaults when they're absent. micro_state_pegs (not `pegs`) carries
+// short machine-readable notes, not display prose.
 export type FxRatesResponse = {
-  base_currencies: string[];
-  display_currencies: string[];
-  rates: Record<string, Record<string, number>>;
-  pegs?: { currencies: string[]; peg_currency: string; note: string }[];
-  updated_at: string;
+  base?: string;
+  base_currencies?: string[];
+  display_currencies?: string[];
+  rates: Record<string, number>;
+  micro_state_pegs?: { country: string; currency: string; note: string; peg_confirmed: boolean }[];
+  generated_at?: string;
+  timestamp?: string;
   source?: string;
+  data_sources?: string[];
 };
 
 export type ArbitrageSignal = {
