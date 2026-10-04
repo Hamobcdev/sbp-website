@@ -48,7 +48,11 @@ export default function FxPanel({
     );
   }
 
-  const ratesForBase = data.rates?.[base] ?? {};
+  // `data.rates` is already a flat { code: rate } map resolved to the
+  // response's base currency, not nested per-base — the `base` selector
+  // below is cosmetic until the proxy route forwards it to the upstream
+  // ?base= query param, since every fetch currently returns USD-based rates.
+  const ratesForBase = data.rates ?? {};
 
   return (
     <div className="pdc-panel p-6">
@@ -109,14 +113,14 @@ export default function FxPanel({
       </div>
 
       <div className="mt-4 rounded-sm border border-[var(--pdc-panel-border)] bg-[var(--pdc-accent)]/5 px-4 py-3 font-body text-sm text-[var(--pdc-text-dim)]">
-        {data.pegs?.[0]?.note ?? MICRO_STATE_PEG_NOTE}
+        {MICRO_STATE_PEG_NOTE}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2 font-mono text-[11px] text-[var(--pdc-text-faint)]">
         <span>
           Exchange rates via PDC · {data.source ?? "ECB/Frankfurter"}
         </span>
-        <span>Last updated {formatTimestamp(data.updated_at)}</span>
+        <span>Last updated {formatTimestamp(data.generated_at ?? data.timestamp)}</span>
       </div>
     </div>
   );
