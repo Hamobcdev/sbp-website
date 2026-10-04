@@ -55,7 +55,7 @@ export function formatAgo(ms?: number | null): string {
 }
 
 export function formatUsd(value?: number | null, opts?: { compact?: boolean }): string {
-  if (value == null || Number.isNaN(value)) return "—";
+  if (typeof value !== "number" || Number.isNaN(value)) return "—";
   if (opts?.compact) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -73,13 +73,18 @@ export function formatUsd(value?: number | null, opts?: { compact?: boolean }): 
 }
 
 export function formatPct(value?: number | null): string {
-  if (value == null || Number.isNaN(value)) return "—";
+  // typeof check (not just value == null) matters here specifically: this
+  // is the one helper in this file that calls .toFixed() directly rather
+  // than going through Intl.NumberFormat, so a non-number value (e.g. a
+  // malformed/degraded API response field) would otherwise throw
+  // "value.toFixed is not a function" instead of rendering "—".
+  if (typeof value !== "number" || Number.isNaN(value)) return "—";
   const sign = value > 0 ? "+" : "";
   return `${sign}${value.toFixed(2)}%`;
 }
 
 export function ChangeBadge({ value }: { value?: number | null }) {
-  if (value == null || Number.isNaN(value)) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
     return <span className="text-[var(--pdc-text-dim)]">—</span>;
   }
   const positive = value >= 0;
