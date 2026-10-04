@@ -5,7 +5,15 @@ import type { RemittanceCorridor, RemittanceCorridorsResponse } from "../types";
 import { formatTimestamp, PanelError, PanelHeading, Skeleton } from "./Shared";
 
 function corridorLabel(c: RemittanceCorridor): string {
-  return c.corridor_label || `${c.from} → ${c.to}`;
+  if (c.send_country && c.receive_country) {
+    return `${c.send_country} → ${c.receive_country}`;
+  }
+  return "Pacific Corridor";
+}
+
+function bestCryptoCostPct(c: RemittanceCorridor): number | null {
+  if (!c.crypto_rails.length) return null;
+  return Math.min(...c.crypto_rails.map((r) => r.total_estimated_cost_pct));
 }
 
 export default function RemittancePanel({
@@ -21,10 +29,9 @@ export default function RemittancePanel({
   const corridors = useMemo(() => data?.corridors ?? [], [data]);
 
   const maxCost = useMemo(() => {
-    const values = corridors.flatMap((c) => [
-      c.traditional_rails.cost_pct,
-      c.crypto_rails.best_cost_pct,
-    ]);
+    const values = corridors
+      .flatMap((c) => [c.traditional_rails?.average_cost_pct, bestCryptoCostPct(c)])
+      .filter((v): v is number => typeof v === "number");
     return values.length ? Math.max(...values, 0.01) : 1;
   }, [corridors]);
 
@@ -66,20 +73,24 @@ export default function RemittancePanel({
 
       <div className="flex flex-col gap-5">
         {corridors.map((c) => {
+          const traditionalCostPct = c.traditional_rails?.average_cost_pct ?? null;
+          const cryptoCostPct = bestCryptoCostPct(c);
           const saving =
             c.potential_saving_pct ??
-            c.traditional_rails.cost_pct - c.crypto_rails.best_cost_pct;
+            (typeof traditionalCostPct === "number" && typeof cryptoCostPct === "number"
+              ? traditionalCostPct - cryptoCostPct
+              : null);
           const traditionalWidth = Math.max(
-            (c.traditional_rails.cost_pct / maxCost) * 100,
+            ((traditionalCostPct ?? 0) / maxCost) * 100,
             2
           );
           const cryptoWidth = Math.max(
-            (c.crypto_rails.best_cost_pct / maxCost) * 100,
+            ((cryptoCostPct ?? 0) / maxCost) * 100,
             0.5
           );
 
           return (
-            <div key={corridorLabel(c)}>
+            <div key={c.corridor_id}>
               <div className="mb-1 flex items-center justify-between">
                 <span className="font-mono text-sm text-[var(--pdc-text)]">
                   {corridorLabel(c)}
@@ -91,18 +102,18 @@ export default function RemittancePanel({
 
               <BarRow
                 label="Traditional"
-                value={c.traditional_rails.cost_pct}
+                value={traditionalCostPct}
                 widthPct={traditionalWidth}
                 colorVar="--pdc-down"
               />
               <BarRow
                 label="Crypto"
-                value={c.crypto_rails.best_cost_pct}
+                value={cryptoCostPct}
                 widthPct={cryptoWidth}
                 colorVar="--pdc-up"
               />
 
-              {c.traditional_rails.static_fallback && (
+              {c.traditional_rails?.static_fallback && (
                 <div className="mt-1 font-mono text-[10px] text-[var(--pdc-text-faint)]">
                   Traditional cost data: World Bank RPW Q4-2024
                 </div>
@@ -131,7 +142,7 @@ function BarRow({
   colorVar,
 }: {
   label: string;
-  value: number;
+  value: number | null;
   widthPct: number;
   colorVar: string;
 }) {
