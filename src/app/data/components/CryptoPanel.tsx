@@ -25,6 +25,9 @@ type PricePoint = { time: UTCTimestamp; value: number };
 
 const MAX_HISTORY_POINTS = 200;
 
+const TIMEFRAMES = ["5m", "15m", "1h", "4h", "8h", "1D", "1W", "1M"] as const;
+type Timeframe = (typeof TIMEFRAMES)[number];
+
 const MONTH_NAMES = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
@@ -60,6 +63,10 @@ export default function CryptoPanel({
   const { data, loading, error } = state;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
+  // UI-only for now: static fallback data has no history, so switching
+  // timeframe doesn't refetch or change what's plotted.
+  // TODO PR-92: wire timeframe to KV cron historical data endpoint
+  const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
   const historyRef = useRef<Map<string, PricePoint[]>>(new Map());
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
@@ -236,6 +243,23 @@ export default function CryptoPanel({
           />
         </div>
       )}
+
+      <div className="mb-2 flex flex-wrap items-center gap-1.5">
+        {TIMEFRAMES.map((tf) => (
+          <button
+            key={tf}
+            type="button"
+            onClick={() => setSelectedTimeframe(tf)}
+            className={`rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-wide transition-colors ${
+              tf === selectedTimeframe
+                ? "bg-[var(--pdc-accent)] text-[var(--pdc-bg)]"
+                : "text-[var(--pdc-text-faint)] hover:text-[var(--pdc-text-dim)]"
+            }`}
+          >
+            {tf}
+          </button>
+        ))}
+      </div>
 
       <div ref={chartContainerRef} className="w-full" />
 

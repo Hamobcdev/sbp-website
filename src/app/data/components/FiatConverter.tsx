@@ -57,7 +57,7 @@ export default function FiatConverter({
       return;
     }
     const usd = amt / rate;
-    setAmountCrypto(String(usd / tokenPrice));
+    setAmountCrypto((usd / tokenPrice).toFixed(4));
   }, [driver, amountFiat, currency, token, rate, tokenPrice]);
 
   // Driver: crypto -> recompute fiat amount from the crypto input.
@@ -69,7 +69,7 @@ export default function FiatConverter({
       return;
     }
     const usd = amt * tokenPrice;
-    setAmountFiat(String(usd * rate));
+    setAmountFiat((usd * rate).toFixed(4));
   }, [driver, amountCrypto, currency, token, rate, tokenPrice]);
 
   const rateUnavailable = !rate || !tokenPrice;

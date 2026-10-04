@@ -43,20 +43,25 @@ export type ArbitrageSignalsResponse = {
   updated_at: string;
 };
 
+// Matches directory-api's pacificRemittanceService.ts response shape —
+// send_country/receive_country (not from/to/corridor_label), an array of
+// per-token crypto_rails (not a single best_cost_pct object), and a
+// traditional_rails that can be null when no World Bank data (live or
+// static) exists for a corridor.
 export type RemittanceCorridor = {
-  corridor_label: string;
-  from: string;
-  to: string;
+  corridor_id: string;
+  send_country: string;
+  receive_country: string;
   traditional_rails: {
-    cost_pct: number;
+    average_cost_pct: number;
     static_fallback?: boolean;
-    source?: string;
-  };
-  crypto_rails: {
-    best_cost_pct: number;
-    venue?: string;
-  };
-  potential_saving_pct?: number;
+    data_source?: string;
+  } | null;
+  crypto_rails: Array<{
+    token: string;
+    total_estimated_cost_pct: number;
+  }>;
+  potential_saving_pct: number | null;
 };
 
 export type RemittanceCorridorsResponse = {
