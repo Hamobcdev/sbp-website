@@ -25,6 +25,22 @@ type PricePoint = { time: UTCTimestamp; value: number };
 
 const MAX_HISTORY_POINTS = 200;
 
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+// prices_as_of is "YYYY-MM" (directory-api's pacificCryptoRatesService.ts) —
+// rendered as "Oct 2026" rather than the raw value.
+function formatPricesAsOf(value?: string | null): string {
+  if (!value) return "a recent snapshot";
+  const [yearStr, monthStr] = value.split("-");
+  const year = Number(yearStr);
+  const monthIndex = Number(monthStr) - 1;
+  if (!Number.isFinite(year) || monthIndex < 0 || monthIndex > 11) return value;
+  return `${MONTH_NAMES[monthIndex]} ${year}`;
+}
+
 function pickToken(
   tokens: CryptoToken[],
   symbol: string | null
@@ -161,17 +177,32 @@ export default function CryptoPanel({
     return (
       <div className="pdc-panel p-6">
         <PanelHeading title="Crypto Prices" />
-        <PanelError message={error} />
+        <PanelError message={error ?? "Crypto prices temporarily unavailable"} />
       </div>
     );
   }
 
   const selectedToken = pickToken(sortedTokens, selectedSymbol);
+  const isStaticFallback = data.static_fallback === true;
 
   return (
     <div className="pdc-panel p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <PanelHeading title="Crypto Prices" subtitle="Live price feed — PDC" />
+        <div className="flex flex-wrap items-center gap-2">
+          <PanelHeading
+            title="Crypto Prices"
+            subtitle={
+              isStaticFallback
+                ? `Prices as of ${formatPricesAsOf(data.prices_as_of)}`
+                : "Live price feed — PDC"
+            }
+          />
+          {isStaticFallback && (
+            <span className="rounded-full border border-[var(--pdc-panel-border)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wide text-[var(--pdc-text-faint)]">
+              Static
+            </span>
+          )}
+        </div>
         <select
           value={selectedSymbol ?? ""}
           onChange={(e) => setSelectedSymbol(e.target.value)}

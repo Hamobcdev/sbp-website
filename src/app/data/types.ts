@@ -11,6 +11,12 @@ export type CryptoRatesResponse = {
   tokens: CryptoToken[];
   pacific_priority_tokens: string[];
   updated_at: string;
+  // Added alongside the directory-api static price fallback for when
+  // CoinGecko is unreachable from Cloudflare Workers — static_fallback is
+  // always present; the other two are null on a live response.
+  static_fallback?: boolean;
+  static_fallback_reason?: string | null;
+  prices_as_of?: string | null;
 };
 
 export type FxRatesResponse = {
