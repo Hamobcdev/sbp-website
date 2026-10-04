@@ -85,7 +85,7 @@ export default function RemittancePanel({
                   {corridorLabel(c)}
                 </span>
                 <span className="font-mono text-xs text-[var(--pdc-up)]">
-                  Save {saving.toFixed(2)}%
+                  Save {typeof saving === "number" ? saving.toFixed(2) : "—"}%
                 </span>
               </div>
 
@@ -147,7 +147,7 @@ function BarRow({
         />
       </div>
       <span className="w-16 shrink-0 text-right font-mono text-xs text-[var(--pdc-text)]">
-        {value.toFixed(2)}%
+        {typeof value === "number" ? value.toFixed(2) : "—"}%
       </span>
     </div>
   );
