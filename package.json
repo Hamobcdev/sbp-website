@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
+    "lightweight-charts": "^5.2.1",
     "next": "14.2.35",
     "next-mdx-remote": "^6.0.0",
     "react": "^18",

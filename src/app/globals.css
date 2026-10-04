@@ -92,3 +92,69 @@ body {
     background-clip: text;
   }
 }
+
+/* Pacific Data Dashboard (/data) — scoped theme tokens, self-contained */
+.pdc-root {
+  --pdc-bg: var(--navy);
+  --pdc-panel: rgba(255, 255, 255, 0.04);
+  --pdc-panel-border: rgba(0, 212, 200, 0.2);
+  --pdc-text: #ffffff;
+  --pdc-text-dim: var(--silver);
+  --pdc-text-faint: var(--silver-dim);
+  --pdc-up: var(--green-live);
+  --pdc-down: #ff5c5c;
+  --pdc-accent: var(--teal);
+  --pdc-accent-gold: var(--gold);
+  --pdc-skeleton: rgba(255, 255, 255, 0.06);
+  --pdc-chart-bg: #0a1628;
+}
+
+.pdc-root[data-pdc-theme="light"] {
+  --pdc-bg: #f6f8fb;
+  --pdc-panel: #ffffff;
+  --pdc-panel-border: rgba(10, 22, 40, 0.1);
+  --pdc-text: var(--ink);
+  --pdc-text-dim: #5b6b80;
+  --pdc-text-faint: #8899aa;
+  --pdc-up: #0a9448;
+  --pdc-down: #d1324a;
+  --pdc-accent: #0b9c92;
+  --pdc-accent-gold: #b9790f;
+  --pdc-skeleton: rgba(10, 22, 40, 0.06);
+  --pdc-chart-bg: #ffffff;
+}
+
+.pdc-root {
+  background: var(--pdc-bg);
+  color: var(--pdc-text);
+  min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.pdc-panel {
+  background: var(--pdc-panel);
+  border: 1px solid var(--pdc-panel-border);
+  border-radius: var(--radius-md);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.pdc-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--pdc-skeleton) 25%,
+    rgba(136, 153, 170, 0.18) 37%,
+    var(--pdc-skeleton) 63%
+  );
+  background-size: 400% 100%;
+  animation: pdcSkeletonShimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes pdcSkeletonShimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

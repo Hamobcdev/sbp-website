@@ -9,6 +9,7 @@ const LINKS = [
   { label: "Platform", href: "#platform" },
   { label: "Research", href: "#research" },
   { label: "Blog", href: "/blog" },
+  { label: "Pacific Data", href: "/data" },
   { label: "Education", href: "#education" },
   { label: "Contact", href: "#contact" },
   { label: "TipTide", href: "https://tiptide.synergybcpacific.com" },
