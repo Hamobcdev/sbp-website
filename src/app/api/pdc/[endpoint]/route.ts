@@ -17,7 +17,11 @@ const ENDPOINT_MAP: Record<
     // is needed on either side of this proxy.
     forwardParams: ["symbol", "tf"],
   },
-  fx: { path: "/finance/fx", cacheSeconds: 86400 },
+  fx: {
+    path: "/finance/fx",
+    cacheSeconds: 86400,
+    forwardParams: ["base"],
+  },
   "remittance-corridors": {
     path: "/finance/remittance-corridors",
     cacheSeconds: 86400,
