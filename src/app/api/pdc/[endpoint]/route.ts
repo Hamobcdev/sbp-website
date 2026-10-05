@@ -2,9 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 
 const PDC_BASE_URL = "https://api.synergybcpacific.com";
 
-const ENDPOINT_MAP: Record<string, { path: string; cacheSeconds: number }> = {
+const ENDPOINT_MAP: Record<
+  string,
+  { path: string; cacheSeconds: number; forwardParams?: string[] }
+> = {
   "crypto-rates": { path: "/finance/crypto-rates", cacheSeconds: 60 },
-  fx: { path: "/finance/fx", cacheSeconds: 86400 },
+  "crypto-history": {
+    path: "/finance/crypto-history",
+    cacheSeconds: 60,
+    // directory-api's own query params are `symbol` and `tf` (not
+    // `interval`) — see routes/finance/crypto-history.ts. Forwarded
+    // verbatim; CryptoPanel.tsx's TIMEFRAMES values already match `tf`'s
+    // expected values (5m/15m/1h/4h/8h/1D/1W/1M) exactly, so no mapping
+    // is needed on either side of this proxy.
+    forwardParams: ["symbol", "tf"],
+  },
+  fx: {
+    path: "/finance/fx",
+    cacheSeconds: 86400,
+    forwardParams: ["base"],
+  },
   "remittance-corridors": {
     path: "/finance/remittance-corridors",
     cacheSeconds: 86400,
@@ -16,7 +33,7 @@ const ENDPOINT_MAP: Record<string, { path: string; cacheSeconds: number }> = {
 };
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { endpoint: string } }
 ) {
   const entry = ENDPOINT_MAP[params.endpoint];
@@ -34,8 +51,14 @@ export async function GET(
     );
   }
 
+  const upstreamUrl = new URL(`${PDC_BASE_URL}${entry.path}`);
+  for (const name of entry.forwardParams ?? []) {
+    const value = req.nextUrl.searchParams.get(name);
+    if (value) upstreamUrl.searchParams.set(name, value);
+  }
+
   try {
-    const upstream = await fetch(`${PDC_BASE_URL}${entry.path}`, {
+    const upstream = await fetch(upstreamUrl, {
       headers: {
         "X-Internal-Key": internalKey,
         Accept: "application/json",

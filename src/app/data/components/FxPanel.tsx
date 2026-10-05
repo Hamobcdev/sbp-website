@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { FxRatesResponse } from "../types";
 import { MICRO_STATE_PEG_NOTE, PACIFIC_CURRENCY_INFO } from "../types";
 import { formatTimestamp, PanelError, PanelHeading, Skeleton } from "./Shared";
@@ -8,13 +8,52 @@ import { formatTimestamp, PanelError, PanelHeading, Skeleton } from "./Shared";
 const DEFAULT_BASES = ["USD", "AUD", "NZD", "EUR", "GBP"];
 const DISPLAY_CURRENCIES = ["WST", "FJD", "TOP", "PGK", "VUV", "SBD", "XPF"];
 
+type FxState = { data: FxRatesResponse | null; loading: boolean; error: string | null };
+
 export default function FxPanel({
   state,
 }: {
-  state: { data: FxRatesResponse | null; loading: boolean; error: string | null };
+  state: FxState;
 }) {
-  const { data, loading, error } = state;
   const [base, setBase] = useState("USD");
+  const [override, setOverride] = useState<FxState | null>(null);
+  const isFirstRender = useRef(true);
+
+  // The initial `state` prop is already base=USD (usePDCData's default
+  // fetch), so only re-fetch once the user actually changes the base away
+  // from the panel's own initial selection.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    let cancelled = false;
+    setOverride({ data: null, loading: true, error: null });
+
+    fetch(`/api/pdc/fx?base=${encodeURIComponent(base)}`, { cache: "no-store" })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load fx rates");
+        return res.json() as Promise<FxRatesResponse>;
+      })
+      .then((data) => {
+        if (!cancelled) setOverride({ data, loading: false, error: null });
+      })
+      .catch(() => {
+        if (!cancelled)
+          setOverride({
+            data: null,
+            loading: false,
+            error: "Data temporarily unavailable",
+          });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [base]);
+
+  const { data, loading, error } = override ?? state;
 
   const bases = useMemo(
     () => (data?.base_currencies?.length ? data.base_currencies : DEFAULT_BASES),
@@ -49,9 +88,8 @@ export default function FxPanel({
   }
 
   // `data.rates` is already a flat { code: rate } map resolved to the
-  // response's base currency, not nested per-base — the `base` selector
-  // below is cosmetic until the proxy route forwards it to the upstream
-  // ?base= query param, since every fetch currently returns USD-based rates.
+  // response's base currency (the `base` selector re-fetches with
+  // ?base=<code> on change, see the effect above).
   const ratesForBase = data.rates ?? {};
 
   return (

@@ -10,7 +10,12 @@ import {
   ISeriesApi,
   UTCTimestamp,
 } from "lightweight-charts";
-import type { CryptoRatesResponse, CryptoToken, FxRatesResponse } from "../types";
+import type {
+  CryptoHistoryResponse,
+  CryptoRatesResponse,
+  CryptoToken,
+  FxRatesResponse,
+} from "../types";
 import { useDashboardTheme } from "../ThemeContext";
 import {
   ChangeBadge,
@@ -24,8 +29,6 @@ import {
 import FiatConverter from "./FiatConverter";
 
 type PricePoint = { time: UTCTimestamp; value: number };
-
-const MAX_HISTORY_POINTS = 200;
 
 const TIMEFRAMES = ["5m", "15m", "1h", "4h", "8h", "1D", "1W", "1M"] as const;
 type Timeframe = (typeof TIMEFRAMES)[number];
@@ -89,11 +92,9 @@ export default function CryptoPanel({
   const { data, loading, error } = state;
 
   const [selectedSymbol, setSelectedSymbol] = useState<string | null>(null);
-  // UI-only for now: static fallback data has no history, so switching
-  // timeframe doesn't refetch or change what's plotted.
-  // TODO PR-92: wire timeframe to KV cron historical data endpoint
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>("1D");
-  const historyRef = useRef<Map<string, PricePoint[]>>(new Map());
+  const [historyNote, setHistoryNote] = useState<string | null>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -117,20 +118,6 @@ export default function CryptoPanel({
     const defaultSymbol = priorityTokens[0] ?? tokens[0]?.symbol ?? null;
     setSelectedSymbol(defaultSymbol);
   }, [tokens, priorityTokens, selectedSymbol]);
-
-  useEffect(() => {
-    if (!data) return;
-    const nowSeconds = Math.floor(Date.now() / 1000) as UTCTimestamp;
-    for (const token of data.tokens) {
-      const series = historyRef.current.get(token.symbol) ?? [];
-      const last = series[series.length - 1];
-      if (!last || last.time !== nowSeconds) {
-        series.push({ time: nowSeconds, value: token.price_usd });
-        if (series.length > MAX_HISTORY_POINTS) series.shift();
-        historyRef.current.set(token.symbol, series);
-      }
-    }
-  }, [data]);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -188,20 +175,54 @@ export default function CryptoPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
+  // Fetches real history from directory-api's /finance/crypto-history (via
+  // the /api/pdc proxy, which holds DASHBOARD_INTERNAL_KEY server-side) on
+  // every symbol/timeframe change — replaces the prior UI-only local tick
+  // accumulation (PR-92's TODO). cancelled guards against a slow response
+  // landing after the user has already switched symbol/timeframe again.
+  useEffect(() => {
+    if (!selectedSymbol) return;
+    let cancelled = false;
+
+    setHistoryError(null);
+    setHistoryNote(null);
+
+    fetch(
+      `/api/pdc/crypto-history?symbol=${encodeURIComponent(selectedSymbol)}&tf=${encodeURIComponent(selectedTimeframe)}`,
+      { cache: "no-store" }
+    )
+      .then((res) => {
+        if (!res.ok) throw new Error(`Failed to load history for ${selectedSymbol}`);
+        return res.json() as Promise<CryptoHistoryResponse>;
+      })
+      .then((history) => {
+        if (cancelled || !seriesRef.current) return;
+        const points: PricePoint[] = history.points.map((p) => ({
+          time: Math.floor(new Date(p.t).getTime() / 1000) as UTCTimestamp,
+          value: p.p,
+        }));
+        seriesRef.current.setData(points);
+        setHistoryNote(history.note);
+        chartRef.current?.timeScale().fitContent();
+      })
+      .catch(() => {
+        if (!cancelled) setHistoryError("Chart history temporarily unavailable");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedSymbol, selectedTimeframe]);
+
   useEffect(() => {
     if (!seriesRef.current || !selectedSymbol) return;
-    const points = historyRef.current.get(selectedSymbol) ?? [];
-    seriesRef.current.setData(points);
-
     const price = pickToken(tokens, selectedSymbol)?.price_usd;
     const range = chartPriceRange(selectedSymbol, typeof price === "number" ? price : null);
     seriesRef.current.applyOptions({
       autoscaleInfoProvider: (original: () => AutoscaleInfo | null) =>
         range ? { priceRange: range } : original(),
     });
-
-    chartRef.current?.timeScale().fitContent();
-  }, [selectedSymbol, data, tokens]);
+  }, [selectedSymbol, tokens]);
 
   if (loading) {
     return (
@@ -298,6 +319,12 @@ export default function CryptoPanel({
       </div>
 
       <div ref={chartContainerRef} className="w-full" />
+
+      {(historyNote || historyError) && (
+        <div className="mt-1 font-mono text-[11px] text-[var(--pdc-text-faint)]">
+          {historyError ?? historyNote}
+        </div>
+      )}
 
       <div className="mt-2 text-right font-mono text-[11px] text-[var(--pdc-text-faint)]">
         Last updated {formatLastUpdated(data.cached_at)}
