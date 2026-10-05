@@ -14,7 +14,8 @@ import type { CryptoRatesResponse, CryptoToken, FxRatesResponse } from "../types
 import { useDashboardTheme } from "../ThemeContext";
 import {
   ChangeBadge,
-  formatTimestamp,
+  formatLastUpdated,
+  formatMarketCap,
   formatUsd,
   PanelError,
   PanelHeading,
@@ -274,7 +275,7 @@ export default function CryptoPanel({
           />
           <Stat
             label="Market Cap"
-            value={formatUsd(selectedToken.market_cap_usd, { compact: true })}
+            value={formatMarketCap(selectedToken.market_cap_usd)}
           />
         </div>
       )}
@@ -299,7 +300,7 @@ export default function CryptoPanel({
       <div ref={chartContainerRef} className="w-full" />
 
       <div className="mt-2 text-right font-mono text-[11px] text-[var(--pdc-text-faint)]">
-        Last updated {formatTimestamp(data.updated_at)}
+        Last updated {formatLastUpdated(data.cached_at)}
       </div>
 
       <FiatConverter

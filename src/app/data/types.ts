@@ -10,7 +10,11 @@ export type CryptoToken = {
 export type CryptoRatesResponse = {
   tokens: CryptoToken[];
   pacific_priority_tokens: string[];
-  updated_at: string;
+  // directory-api's /finance/crypto-rates sends cached_at, not
+  // updated_at — this previously named the wrong field, so "Last
+  // updated" always read undefined. Optional/nullable defensively;
+  // the live response always sets it, but never assume that here.
+  cached_at?: string | null;
   // Added alongside the directory-api static price fallback for when
   // CoinGecko is unreachable from Cloudflare Workers — static_fallback is
   // always present; the other two are null on a live response.
