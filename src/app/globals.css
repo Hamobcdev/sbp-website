@@ -131,6 +131,16 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+/* Native <select> popups render <option>s with the browser's own listbox
+   background, not the page's — a <select> styled bg-transparent on a dark
+   panel inherits white text that becomes invisible against that default
+   white listbox until the hover highlight changes the contrast. Pin both
+   colors explicitly so every option is legible in its default state. */
+.pdc-root select option {
+  background-color: var(--pdc-bg);
+  color: var(--pdc-text);
+}
+
 .pdc-panel {
   background: var(--pdc-panel);
   border: 1px solid var(--pdc-panel-border);
