@@ -44,6 +44,23 @@ export function formatTimestamp(iso?: string | null): string {
   }
 }
 
+// "Last updated" specifically reads as a transient in-progress state when
+// the timestamp hasn't arrived yet (first paint, or a field renamed on the
+// API side) — "Updating..." says the data is on its way, where the
+// generic "—" (formatTimestamp's fallback, used for truly absent/
+// not-applicable values elsewhere on this dashboard) would misleadingly
+// read as "never updated."
+export function formatLastUpdated(iso?: string | null): string {
+  if (!iso) return "Updating...";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "Updating...";
+  return date.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
 export function formatAgo(ms?: number | null): string {
   if (ms == null || Number.isNaN(ms)) return "—";
   const seconds = Math.round(ms / 1000);
@@ -69,6 +86,21 @@ export function formatUsd(value?: number | null, opts?: { compact?: boolean }): 
     style: "currency",
     currency: "USD",
     maximumFractionDigits,
+  }).format(value);
+}
+
+// Kraken (the crypto cron's price source) doesn't supply market cap data,
+// so market_cap_usd comes through as 0, not absent — formatUsd would
+// render that as "$0", which reads as "this token is worthless" rather
+// than "we don't have this figure." N/A for 0/null/negative; never a
+// dollar amount for this field specifically.
+export function formatMarketCap(value?: number | null): string {
+  if (typeof value !== "number" || Number.isNaN(value) || value <= 0) return "N/A";
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: "compact",
+    maximumFractionDigits: 2,
   }).format(value);
 }
 
