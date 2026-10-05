@@ -23,6 +23,24 @@ export type CryptoRatesResponse = {
   prices_as_of?: string | null;
 };
 
+// Matches directory-api's /finance/crypto-history response
+// (routes/finance/crypto-history.ts) — points is {t, p}[] (ISO timestamp +
+// USD price), not {time, value}[]; the dashboard maps that into the
+// lightweight-charts point shape itself. note is non-null only for the
+// 1W/1M timeframes, which the KV history buffer can't fully satisfy yet
+// (see that route's own doc comment) — surfaced in the UI rather than
+// hidden, same transparency posture as every other PDC endpoint.
+export type CryptoHistoryPoint = { t: string; p: number };
+
+export type CryptoHistoryResponse = {
+  symbol: string;
+  timeframe: string;
+  points: CryptoHistoryPoint[];
+  point_count: number;
+  max_available_points: number;
+  note: string | null;
+};
+
 // Matches directory-api's /finance/fx response (fxRateService.ts +
 // routes/finance/fx.ts) — `rates` is a flat Record<code, number> already
 // resolved to the response's `base` currency (USD unless ?base= was
