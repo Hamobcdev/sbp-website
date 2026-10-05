@@ -9,6 +9,18 @@ import FxPanel from "./components/FxPanel";
 import ArbitragePanel from "./components/ArbitragePanel";
 import RemittancePanel from "./components/RemittancePanel";
 
+function RegulatoryBanner() {
+  return (
+    <div className="mb-6 rounded-md border border-[var(--pdc-accent-gold)]/40 bg-[var(--pdc-accent-gold)]/10 px-4 py-3 font-body text-sm text-[var(--pdc-text)]">
+      ⚠️ The DEX arbitrage signals and crypto analytics on this dashboard are
+      for informational purposes only. Synergy Blockchain Pacific is actively
+      working with Pacific Island regulators to establish a clear framework
+      for digital asset innovation across the region. Features marked
+      pending are subject to regulatory approval.
+    </div>
+  );
+}
+
 function ThemeToggle() {
   const { theme, toggle } = useDashboardTheme();
   return (
@@ -46,6 +58,8 @@ export default function DashboardClient({
           <ThemeToggle />
         </div>
       </div>
+
+      <RegulatoryBanner />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="lg:col-span-2">
