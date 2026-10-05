@@ -140,6 +140,21 @@ export default function CryptoPanel({
   const [showVolume, setShowVolume] = useState(true);
   const [showRSI, setShowRSI] = useState(false);
 
+  // page.tsx server-fetches initialCrypto, so this panel (unlike the
+  // other three, which always start in a loading state) can render real
+  // data on the very first, server-matched paint. formatLastUpdated()
+  // formats with the runtime's default locale/timezone (Intl without a
+  // fixed locale/timeZone) — Vercel's server and a visitor's browser
+  // rarely agree on either, so rendering it unconditionally produced a
+  // server/client text mismatch (React errors #418/#423/#425 in
+  // production). Deferring it to after mount guarantees the first client
+  // render matches the server's HTML exactly; the real local time fills
+  // in a tick later.
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -170,8 +185,12 @@ export default function CryptoPanel({
     setSelectedSymbol(defaultSymbol);
   }, [tokens, priorityTokens, selectedSymbol]);
 
-  // Derived candles + indicator series — recomputed only when the raw
-  // history response changes, not on every toggle/theme flip.
+  // Derived candles + indicator series (bucketing, SMA, RSI — all pure,
+  // no DOM access) — recomputed only when the raw history response
+  // changes, not on every toggle/theme flip or price-tick render. This
+  // was already memoized; it wasn't the source of the "Forced reflow"
+  // warning seen in production (see the chart-setup effect below for the
+  // actual layout-thrash fix).
   const derived = useMemo(() => {
     const points = historyResponse?.points ?? [];
     const candles: Candle[] = bucketPoints(points);
@@ -319,7 +338,18 @@ export default function CryptoPanel({
     if (volumePaneIndex !== null) panes[volumePaneIndex]?.setStretchFactor(1);
     if (rsiPaneIndex !== null) panes[rsiPaneIndex]?.setStretchFactor(1);
 
-    chart.subscribeCrosshairMove((param) => {
+    // Named (not inline) so the same reference can be passed to
+    // unsubscribeCrosshairMove below — an anonymous handler can only ever
+    // be subscribed, never individually removed, which is how this leaked
+    // a listener per chart rebuild (every timeframe/toggle/theme change)
+    // until the MaxListenersExceededWarning showed up in production.
+    const handleCrosshairMove: Parameters<IChartApi["subscribeCrosshairMove"]>[0] = (
+      param
+    ) => {
+      // Guards against a crosshair event that was already in flight when
+      // this effect's cleanup ran (e.g. a toggle clicked mid-hover) from
+      // touching a chart/series that chart.remove() has torn down.
+      if (!chartRef.current) return;
       const tooltipEl = tooltipRef.current;
       if (!tooltipEl) return;
       const seriesData = param.point && param.seriesData.get(mainSeries);
@@ -339,18 +369,31 @@ export default function CryptoPanel({
       tooltipEl.style.display = "block";
       tooltipEl.style.left = `${param.point.x + 12}px`;
       tooltipEl.style.top = `${param.point.y + 12}px`;
-    });
-
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
     };
-    handleResize();
-    window.addEventListener("resize", handleResize);
+    chart.subscribeCrosshairMove(handleCrosshairMove);
+
+    // Reading clientWidth right after createChart/addSeries (which just
+    // inserted several canvases — one main pane plus one per volume/RSI
+    // pane) forces a synchronous layout before the browser's next paint —
+    // the "Forced reflow" warning. Deferring the read to a rAF lets layout
+    // happen on the browser's own schedule instead.
+    let resizeFrame: number | null = null;
+    const scheduleResize = () => {
+      if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
+      resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = null;
+        if (chartContainerRef.current) {
+          chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+        }
+      });
+    };
+    scheduleResize();
+    window.addEventListener("resize", scheduleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", scheduleResize);
+      if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
+      chart.unsubscribeCrosshairMove(handleCrosshairMove);
       chart.remove();
       chartRef.current = null;
       candleSeriesRef.current = null;
@@ -586,7 +629,7 @@ export default function CryptoPanel({
       </div>
 
       <div className="mt-2 text-right font-mono text-[11px] text-[var(--pdc-text-faint)]">
-        Last updated {formatLastUpdated(data.cached_at)}
+        Last updated {hasMounted ? formatLastUpdated(data.cached_at) : "—"}
       </div>
 
       <FiatConverter
