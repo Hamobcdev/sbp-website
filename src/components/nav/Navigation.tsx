@@ -3,15 +3,22 @@
 import Image from "next/image";
 import { useState } from "react";
 
+// About/Services/Platform/Research/Education/Contact are sections on the
+// homepage (see each component's `id="..."` and app/page.tsx), not
+// standalone routes — there is no /education page. A bare "#about" only
+// scrolls correctly when already on "/"; from /data or /blog it either
+// does nothing or searches the current page for that id. The leading
+// "/" forces Next.js to navigate home first, then the browser's native
+// hash-scroll takes over once there.
 const LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Platform", href: "#platform" },
-  { label: "Research", href: "#research" },
+  { label: "About", href: "/#about" },
+  { label: "Services", href: "/#services" },
+  { label: "Platform", href: "/#platform" },
+  { label: "Research", href: "/#research" },
   { label: "Blog", href: "/blog" },
   { label: "Pacific Data", href: "/data" },
-  { label: "Education", href: "#education" },
-  { label: "Contact", href: "#contact" },
+  { label: "Education", href: "/#education" },
+  { label: "Contact", href: "/#contact" },
   { label: "TipTide", href: "https://tiptide.synergybcpacific.com" },
 ];
 
