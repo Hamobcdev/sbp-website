@@ -63,7 +63,7 @@ export async function GET(
         "X-Internal-Key": internalKey,
         Accept: "application/json",
       },
-      next: { revalidate: entry.cacheSeconds },
+      cache: "no-store",
     });
 
     if (!upstream.ok) {
